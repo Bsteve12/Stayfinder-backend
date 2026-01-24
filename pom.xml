@@ -34,13 +34,13 @@
             <artifactId>spring-boot-starter-data-jpa</artifactId>
         </dependency>
 
-        <!-- Driver MariaDB -->
+        <!-- Driver PostgresSql -->
         <dependency>
-            <groupId>org.mariadb.jdbc</groupId>
-            <artifactId>mariadb-java-client</artifactId>
+            <groupId>org.postgresql</groupId>
+            <artifactId>postgresql</artifactId>
             <scope>runtime</scope>
-            <version>3.4.1</version>
         </dependency>
+
 
         <!-- Validaciones con Jakarta Validation -->
         <dependency>
