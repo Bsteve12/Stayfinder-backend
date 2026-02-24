@@ -1,4 +1,6 @@
-package com.stayFinder.proyectoFinal.config;
+ /*package com.stayFinder.proyectoFinal.config;
+
+
 
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -13,3 +15,4 @@ public class MailConfigDev {
         return new JavaMailSenderImpl(); // Bean vacío, no rompe en dev
     }
 }
+*/

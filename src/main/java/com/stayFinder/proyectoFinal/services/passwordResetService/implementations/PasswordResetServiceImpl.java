@@ -29,6 +29,7 @@ public class PasswordResetServiceImpl implements PasswordResetServiceInterface {
         Usuario usuario = usuarioRepo.findById(dto.getUsuarioId())
                 .orElseThrow(() -> new Exception("Usuario no encontrado"));
 
+        // Generar un token único
         String token = UUID.randomUUID().toString();
 
         PasswordResetToken resetToken = PasswordResetToken.builder()
@@ -40,11 +41,18 @@ public class PasswordResetServiceImpl implements PasswordResetServiceInterface {
 
         tokenRepo.save(resetToken);
 
-        // Enviar email (prototipo)
+        // --- CAMBIO AQUÍ: Generar el enlace real para el Frontend ---
+        String urlFrontend = "http://localhost:4200/reset-password?token=" + token;
+
         String body = "Hola " + usuario.getNombre() + ",\n\n"
-                + "Usa este token para restablecer tu contraseña: " + token
-                + "\n\nEl token expira en 15 minutos.";
-        emailService.sendReservationConfirmation(usuario.getEmail(), "Recuperación de contraseña", body);
+                + "Hemos recibido una solicitud para restablecer tu contraseña en StayFinder.\n"
+                + "Para completar el proceso, haz clic en el siguiente enlace:\n\n"
+                + urlFrontend + "\n\n"
+                + "Este enlace es válido por 15 minutos.\n"
+                + "Si no solicitaste este cambio, puedes ignorar este mensaje de forma segura.";
+
+        // Usamos tu servicio de email para enviar el link real
+        emailService.sendReservationConfirmation(usuario.getEmail(), "Recuperación de contraseña - StayFinder", body);
 
         return PasswordResetTokenResponseDTO.builder()
                 .id(resetToken.getId())
@@ -57,17 +65,25 @@ public class PasswordResetServiceImpl implements PasswordResetServiceInterface {
 
     @Override
     public void resetPassword(String token, String nuevaPassword) throws Exception {
+        // Buscar el token en la base de datos
         PasswordResetToken resetToken = tokenRepo.findByToken(token)
-                .orElseThrow(() -> new Exception("Token inválido"));
+                .orElseThrow(() -> new Exception("El enlace de recuperación es inválido o ya no existe."));
 
-        if (resetToken.isUsado() || resetToken.getExpiresAt().isBefore(LocalDateTime.now())) {
-            throw new Exception("Token expirado o ya usado");
+        // Validar si ya fue usado o si expiró
+        if (resetToken.isUsado()) {
+            throw new Exception("Este enlace ya ha sido utilizado.");
         }
 
+        if (resetToken.getExpiresAt().isBefore(LocalDateTime.now())) {
+            throw new Exception("El enlace ha expirado. Por favor, solicita uno nuevo.");
+        }
+
+        // Obtener el usuario asociado y actualizar la contraseña codificada
         Usuario usuario = resetToken.getUsuario();
         usuario.setContrasena(passwordEncoder.encode(nuevaPassword));
         usuarioRepo.save(usuario);
 
+        // Marcar el token como usado para que no se pueda volver a usar
         resetToken.setUsado(true);
         tokenRepo.save(resetToken);
     }

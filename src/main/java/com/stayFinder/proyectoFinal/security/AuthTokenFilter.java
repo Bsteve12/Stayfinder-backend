@@ -27,7 +27,7 @@ public class AuthTokenFilter extends OncePerRequestFilter {
         String path = request.getRequestURI();
 
         //  Ignorar rutas públicas para que no intente validar token
-        if (path.startsWith("/api/usuario") || path.startsWith("/auth") || path.startsWith("/swagger") || path.startsWith("/v3/api-docs")) {
+        if (path.startsWith("/api/usuario") || path.startsWith("/auth") || path.startsWith("/swagger") || path.startsWith("/v3/api-docs") || path.startsWith("/api/auth")) {
             filterChain.doFilter(request, response);
             return;
         }
