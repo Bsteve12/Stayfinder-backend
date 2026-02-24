@@ -34,7 +34,7 @@ public class JWTUtil {
     public String GenerateToken(long usuarioId, String email, Role role){
         long expirationInMs = tokenExpiration;
         Claims claims = Jwts.claims()
-                .setId(Long.toString(usuarioId)) // 👈 Ahora usa correctamente el ID de Negocio
+                .setId(Long.toString(usuarioId)) //
                 .setSubject(email)
                 .setIssuer(role.toString())
                 .setExpiration(new Date(System.currentTimeMillis() + expirationInMs))
